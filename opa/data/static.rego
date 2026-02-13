@@ -1,14 +1,13 @@
 package static
 
 role_permissions := {
-  "admin": ["login", "transfer", "approve"],
-  "employee": ["login", "transfer"],
-  "viewer": ["login"]
+  "approval": ["login", "transfer", "approve", "view"],
+  "user": ["login", "transfer", "view"],
+  "viewer": ["login", "view"]
 }
 
 transfer_limits := {
-  "employee": 10000,
-  "admin": 100000
+  "user": 100000,
 }
 
 errors := {
@@ -18,3 +17,4 @@ errors := {
     "message": "Transfer amount exceeds allowed limit"
   }
 }
+

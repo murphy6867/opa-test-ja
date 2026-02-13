@@ -1,46 +1,57 @@
 package com.ops.authservice.controller;
 
-import com.ops.authservice.dto.LoginRequest;
-import com.ops.authservice.model.User;
-import com.ops.authservice.service.AuthService;
+import com.ops.authservice.dto.ApiResponse;
+import com.ops.authservice.dto.CreateUserRequest;
+import com.ops.authservice.dto.SignInRequest;
+import com.ops.authservice.dto.UserResponse;
+import com.ops.authservice.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/v1/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService loginService;
-    private final AuthService authService;
-
-    public AuthController(AuthService loginService, AuthService authService) {
-        this.loginService = loginService;
-        this.authService = authService;
-    }
+    private final UserService userService;
 
     @GetMapping("/health")
     public String healthCheck() {
         return "OK";
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
-        User user = loginService.login(request.getUsername());
+    @PostMapping("/sign-up")
+    public ResponseEntity<ApiResponse<UserResponse>> createUser(
+            @Valid @RequestBody CreateUserRequest request) {
 
-        Map<String, Object> response = Map.of(
-                "username", user.getUsername(),
-                "role", user.getRole()
-        );
+        UserResponse response = userService.createUser(request);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.<UserResponse>builder()
+                        .success(true)
+                        .message("User created")
+                        .data(response)
+                        .timestamp(Instant.now())
+                        .build());
     }
 
-    @GetMapping("/get-balance/{username}")
-    public ResponseEntity<?> getBalanceByUsername(@PathVariable String username) {
+    @PostMapping("/sign-in")
+    public ResponseEntity<ApiResponse<UserResponse>> signIn(
+            @Valid @RequestBody SignInRequest request){
 
-        return ResponseEntity.ok(authService.getUserBalance(username));
+        UserResponse response = userService.signInService(request);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<UserResponse>builder()
+                        .success(true)
+                        .message("User Signed In")
+                        .data(response)
+                        .timestamp(Instant.now())
+                        .build());
     }
-
 }
