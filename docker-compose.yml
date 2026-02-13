@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  opa:
+    build:
+      context: ./opa
+    container_name: opa
+    ports:
+      - "8181:8181"
+    networks:
+      - policy-net
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    environment:
+      - OPA_URL=http://opa:8181
+    depends_on:
+      - opa
+    networks:
+      - policy-net
+  
+  transfer-service:
+    build:
+      context: ./services/transfer-service
+    container_name: transfer-service
+    ports:
+      - "8081:8081"
+    environment:
+      - OPA_URL=http://opa:8181
+    depends_on:
+      - opa
+    networks:
+      - policy-net
+
+  approval-service:
+    build:
+      context: ./services/approval-service
+    container_name: approval-service
+    ports:
+      - "8082:8082"
+    environment:
+      - OPA_URL=http://opa:8181
+    depends_on:
+      - opa
+    networks:
+      - policy-net
+
+networks:
+  policy-net:
+    driver: bridge
+
