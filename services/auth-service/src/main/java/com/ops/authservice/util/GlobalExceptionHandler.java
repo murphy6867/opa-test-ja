@@ -42,4 +42,37 @@ public class GlobalExceptionHandler {
                         .timestamp(Instant.now())
                         .build());
     }
+
+        @ExceptionHandler(BankNotFoundException.class)
+        public ResponseEntity<ApiResponse<Void>> handleBankNotFound(BankNotFoundException ex) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(ApiResponse.<Void>builder()
+                                                .success(false)
+                                                .message(ex.getMessage())
+                                                .data(null)
+                                                .timestamp(Instant.now())
+                                                .build());
+        }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInsufficient(InsufficientBalanceException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .data(null)
+                        .timestamp(Instant.now())
+                        .build());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.<Void>builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .data(null)
+                        .timestamp(Instant.now())
+                        .build());
+    }
 }

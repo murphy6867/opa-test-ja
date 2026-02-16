@@ -1,9 +1,9 @@
 package com.ops.authservice.controller;
 
 import com.ops.authservice.dto.ApiResponse;
-import com.ops.authservice.dto.CreateUserRequest;
-import com.ops.authservice.dto.SignInRequest;
-import com.ops.authservice.dto.UserResponse;
+import com.ops.authservice.dto.user.CreateUserRequest;
+import com.ops.authservice.dto.user.SignInRequest;
+import com.ops.authservice.dto.user.UserResponse;
 import com.ops.authservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -51,6 +52,19 @@ public class AuthController {
                         .success(true)
                         .message("User Signed In")
                         .data(response)
+                        .timestamp(Instant.now())
+                        .build());
+    }
+
+    @GetMapping("/getRoleByUserId/{userId}")
+    public ResponseEntity<ApiResponse<String>> getRoleByUserId(
+            @PathVariable UUID userId) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.<String>builder()
+                        .success(true)
+                        .message("User role fetched")
+                        .data(userService.getRoleByUserId(userId))
                         .timestamp(Instant.now())
                         .build());
     }

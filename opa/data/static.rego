@@ -1,13 +1,26 @@
 package static
 
 role_permissions := {
-  "approval": ["login", "transfer", "approve", "view"],
-  "user": ["login", "transfer", "view"],
-  "viewer": ["login", "view"]
+  "ADMIN": ["login", "transfer", "approve", "view"],
+  "AUDITOR": ["login", "view"],
+  "STANDARD": ["login", "transfer", "view"],
+  "PREFERRED": ["login", "transfer", "view"],
+  "PREMIUM": ["login", "transfer", "view"]
 }
 
 transfer_limits := {
-  "user": 100000,
+  "STANDARD": 100000,
+  "PREFERRED": 200000,
+  "PREMIUM": 500000,
+  "ADMIN": 1000000000,
+}
+
+fee_multipliers := {
+  "STANDARD": 1.0,
+  "PREFERRED": 0.5,
+  "PREMIUM": 0.0,
+  "ADMIN": 1.0,
+  "AUDITOR": 1.0,
 }
 
 errors := {

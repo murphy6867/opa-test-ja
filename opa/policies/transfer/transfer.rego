@@ -10,9 +10,12 @@ default result := {
 }
 
 result := {
-  "allow": true
+  "allow": true,
+  "fee_multiplier": data.static.fee_multipliers[input.role],
+  "approval_required": input.amount > 100000
 } if {
   data.static.transfer_limits[input.role]
+  data.static.fee_multipliers[input.role]
   input.amount <= data.static.transfer_limits[input.role]
 }
 

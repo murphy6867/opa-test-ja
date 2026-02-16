@@ -1,7 +1,7 @@
 package com.opa.transferservice.client;
 
-import com.opa.transferservice.dto.OpaDecision;
-import com.opa.transferservice.dto.OpaResponse;
+import com.opa.transferservice.dto.opa.OpaDecision;
+import com.opa.transferservice.dto.opa.OpaResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.client.RestTemplate;

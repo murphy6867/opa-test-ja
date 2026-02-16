@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: transfer-service
+  data:
+    redis:
+      host: redis-cache
+      port: 6379
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+server:
+  port: 8081
+opa:
+  url: http://opa:8181
+auth:
+  url: http://auth-service:8080
+transfer:
+  fee:
+    rate: 0.01

@@ -12,6 +12,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-opa:
-  url: http://opa:8181

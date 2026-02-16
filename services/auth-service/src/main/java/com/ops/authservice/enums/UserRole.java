@@ -1,5 +1,9 @@
 package com.ops.authservice.enums;
 
 public enum UserRole {
-    ADMIN, USER, VIEW
+    ADMIN,
+    AUDITOR,
+    STANDARD,
+    PREFERRED,
+    PREMIUM
 }

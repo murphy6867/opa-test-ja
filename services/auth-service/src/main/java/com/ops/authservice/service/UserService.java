@@ -1,15 +1,17 @@
 package com.ops.authservice.service;
 
-import com.ops.authservice.client.OpaClient;
-import com.ops.authservice.dto.CreateUserRequest;
-import com.ops.authservice.dto.SignInRequest;
-import com.ops.authservice.dto.UserResponse;
+import com.ops.authservice.dto.user.CreateUserRequest;
+import com.ops.authservice.dto.user.SignInRequest;
+import com.ops.authservice.dto.user.UserResponse;
 import com.ops.authservice.entity.Account;
+import com.ops.authservice.entity.Bank;
 import com.ops.authservice.entity.User;
 import com.ops.authservice.repository.AccountRepository;
+import com.ops.authservice.repository.BankRepository;
 import com.ops.authservice.repository.UserRepository;
 import com.ops.authservice.util.UserNotFoundException;
 import com.ops.authservice.util.UsernameAlreadyExistsException;
+import com.ops.authservice.util.BankNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,9 +28,9 @@ public class UserService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
-    private final OpaClient opaClient;
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final BankRepository bankRepository;
 
     public UserResponse createUser(CreateUserRequest request) {
 
@@ -43,11 +46,14 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
 
+        Bank bank = bankRepository.findById(request.getBankCode())
+            .orElseThrow(() -> new BankNotFoundException(request.getBankCode()));
+
         Account account = Account.builder()
             .user(savedUser)
             .accountName(request.getAccountName())
             .accountNumber(generateUniqueAccountNumber())
-            .bankCode(request.getBankCode())
+            .bank(bank)
             .balance(normalizeMoney(request.getBalance()))
             .build();
 
@@ -60,7 +66,8 @@ public class UserService {
             .accountName(savedAccount.getAccountName())
             .accountNumber(savedAccount.getAccountNumber())
             .role(savedUser.getRole())
-            .bankCode(savedAccount.getBankCode() == null ? null : savedAccount.getBankCode().name())
+            .bankCode(savedAccount.getBank() == null ? null : savedAccount.getBank().getCode())
+            .bankName(savedAccount.getBank() == null ? null : savedAccount.getBank().getName())
                 .build();
 
     }
@@ -107,8 +114,15 @@ public class UserService {
             .accountName(defaultAccount == null ? null : defaultAccount.getAccountName())
             .accountNumber(defaultAccount == null ? null : defaultAccount.getAccountNumber())
                 .role(user.getRole())
-            .bankCode(defaultAccount == null || defaultAccount.getBankCode() == null ? null : defaultAccount.getBankCode().name())
+            .bankCode(defaultAccount == null || defaultAccount.getBank() == null ? null : defaultAccount.getBank().getCode())
+            .bankName(defaultAccount == null || defaultAccount.getBank() == null ? null : defaultAccount.getBank().getName())
                 .build();
+    }
+
+    public String getRoleByUserId(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found"));
+        return user.getRole().name();
     }
 
 }

@@ -1,8 +1,11 @@
 package com.ops.authservice.controller;
 
-import com.ops.authservice.dto.AccountResponse;
+import com.ops.authservice.dto.account.AccountResponse;
 import com.ops.authservice.dto.ApiResponse;
-import com.ops.authservice.dto.CreateAccountRequest;
+import com.ops.authservice.dto.account.BatchAccountRequest;
+import com.ops.authservice.dto.account.CreateAccountRequest;
+import com.ops.authservice.dto.account.DebitAccountRequest;
+import com.ops.authservice.dto.account.DebitAccountResponse;
 import com.ops.authservice.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,17 +53,33 @@ public class AccountController {
                         .build());
     }
 
-    @GetMapping("/{accountNumber}")
-    public ResponseEntity<ApiResponse<AccountResponse>> getByAccountNumber(
-            @PathVariable String accountNumber) {
+    @PostMapping("/batch-accounts")
+        public ResponseEntity<ApiResponse<List<AccountResponse>>> getByAccountNumbers(
+                        @RequestBody BatchAccountRequest request) {
 
-        AccountResponse account = accountService.getByAccountNumber(accountNumber);
+                List<String> numbers = (request == null) ? null : request.getAccountNumbers();
+                List<AccountResponse> accounts = accountService.getByAccountNumbers(numbers);
+
+                return ResponseEntity.status(HttpStatus.OK)
+                                .body(ApiResponse.<List<AccountResponse>>builder()
+                                                .success(true)
+                                                .message("Accounts fetched")
+                                                .data(accounts)
+                                                .timestamp(Instant.now())
+                                                .build());
+        }
+
+    @PostMapping("/debit")
+    public ResponseEntity<ApiResponse<DebitAccountResponse>> debit(
+            @Valid @RequestBody DebitAccountRequest request) {
+
+        DebitAccountResponse response = accountService.debit(request);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.<AccountResponse>builder()
+                .body(ApiResponse.<DebitAccountResponse>builder()
                         .success(true)
-                        .message("Account fetched")
-                        .data(account)
+                        .message("Debited")
+                        .data(response)
                         .timestamp(Instant.now())
                         .build());
     }

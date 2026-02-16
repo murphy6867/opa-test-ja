@@ -1,17 +1,17 @@
 package auth.decision
 
-test_employee_can_transfer if {
+test_standard_can_transfer if {
   res := result with input as {
-    "role": "employee",
+    "role": "STANDARD",
     "action": "transfer"
   }
 
   res.allow == true
 }
 
-test_viewer_cannot_transfer if {
+test_auditor_cannot_transfer if {
   res := result with input as {
-    "role": "viewer",
+    "role": "AUDITOR",
     "action": "transfer"
   }
 

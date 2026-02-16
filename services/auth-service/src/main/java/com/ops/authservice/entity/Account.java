@@ -1,10 +1,11 @@
 package com.ops.authservice.entity;
 
-import com.ops.authservice.enums.BankCode;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(
@@ -24,8 +25,8 @@ import java.math.BigDecimal;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
@@ -37,10 +38,33 @@ public class Account {
     @Column(name = "account_number", nullable = false, length = 10)
     private String accountNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "bank_code", nullable = false, length = 10)
-    private BankCode bankCode;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "bank_code", nullable = false, referencedColumnName = "code")
+    private Bank bank;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    @PrePersist
+    void onCreate() {
+        Instant now = Instant.now();
+        if (createdAt == null) {
+            createdAt = now;
+        }
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    void onUpdate() {
+                updatedAt = Instant.now();
+        }
 }
